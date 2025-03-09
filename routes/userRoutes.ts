@@ -1,11 +1,7 @@
 import express, { Request, Response } from "express";
 import postMiddleware from "../middleware/postMiddleware";
-import {
-  fetchUserData,
-  postUserData,
-  updateUserData,
-} from "../repository/userCollection";
 import mustHaveIdMiddleware from "../middleware/mustHaveIdMiddleware";
+import { fetchUserData, postUserData, updateUserData } from "../controller/api";
 
 const router = express.Router();
 
