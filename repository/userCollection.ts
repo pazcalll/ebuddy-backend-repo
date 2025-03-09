@@ -1,12 +1,12 @@
 import { DocumentData, QuerySnapshot } from "firebase/firestore";
-import { User } from "../entities/user";
+import { TUser } from "../entities/user";
 
 export default function userCollection(
   querySnapshot: QuerySnapshot<DocumentData, DocumentData>
-): User[] {
-  const users: User[] = [];
+): TUser[] {
+  const users: TUser[] = [];
   querySnapshot.forEach((doc) => {
-    const data: User = {
+    const data: TUser = {
       _id: doc.id,
       totalAverageWeightRatings: doc.data().totalAverageWeightRatings,
       numberOfRents: doc.data().numberOfRents,
