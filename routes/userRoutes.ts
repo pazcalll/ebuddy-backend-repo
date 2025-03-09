@@ -9,6 +9,7 @@ import {
   updateUserData,
 } from "../controller/api";
 import {
+  authenticatedMiddleware,
   loginMiddleware,
   registerMiddleware,
 } from "../middleware/authMiddleware";
@@ -18,7 +19,7 @@ const router = express.Router();
 router.get("/", (req: Request, res: Response) => {
   res.send("Hello from user routes");
 });
-router.get("/fetch-user-data", fetchUserData);
+router.get("/fetch-user-data", authenticatedMiddleware, fetchUserData);
 router.put(
   "/update-user-data/:id",
   postMiddleware,

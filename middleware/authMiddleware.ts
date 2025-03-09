@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from "express";
+import { getAuth } from "firebase/auth";
 import { z } from "zod";
+import { app, admin } from "../config/firebaseConfig";
 
 const registerMiddleware = async (
   req: Request,
@@ -53,4 +55,31 @@ const loginMiddleware = async (
   next();
 };
 
-export { registerMiddleware, loginMiddleware };
+const authenticatedMiddleware = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const token = req.headers["access-token"];
+
+  if (!token) res.status(401).json({ message: "Unauthorized" });
+
+  try {
+    const verificationResponse = await admin
+      .auth()
+      .verifyIdToken(token as string);
+    if (verificationResponse.email == undefined)
+      throw new Error("Unauthorized");
+
+    next();
+  } catch (error: any) {
+    console.log(error);
+    res.status(401).json({ message: error?.message });
+  }
+
+  return;
+
+  next();
+};
+
+export { registerMiddleware, loginMiddleware, authenticatedMiddleware };

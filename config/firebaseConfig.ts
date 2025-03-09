@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
+import admin from "firebase-admin";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -18,7 +19,15 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-export const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+admin.initializeApp({
+  credential: admin.credential.applicationDefault(),
+  projectId: "ebuddy-test-7f4bb",
+  databaseURL: "https://ebuddy-test-7f4bb.firebaseio.com",
+});
 // export const analytics = getAnalytics(app);
+// admin.appCheck();
 
-export const db = getFirestore(app);
+const db = getFirestore(app);
+
+export { app, admin, db };
