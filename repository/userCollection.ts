@@ -1,6 +1,13 @@
 import { Request, Response } from "express";
 import { db } from "../config/firebaseConfig";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  setDoc,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 import { User } from "../entities/user";
 
 const postUserData = async (req: Request, res: Response) => {
@@ -41,4 +48,26 @@ const fetchUserData = async (req: Request, res: Response) => {
   }
 };
 
-export { postUserData, fetchUserData };
+const updateUserData = async (req: Request, res: Response) => {
+  try {
+    await setDoc(doc(db, "USERS", req.params.id), req.body);
+    const id: string = req.params.id;
+    const docRef = doc(db, "USERS", id);
+    const fetchData = await getDoc(docRef);
+    const data = fetchData.data();
+
+    const user: Partial<User> = {
+      _id: fetchData.id,
+      totalAverageWeightRatings: data?.totalAverageWeightRatings,
+      numberOfRents: data?.numberOfRents,
+      recentlyActive: data?.recentlyActive,
+    };
+
+    res.json(user);
+  } catch (error) {
+    console.error("Error updating document: ", error);
+    res.send("Error updating document");
+  }
+};
+
+export { postUserData, fetchUserData, updateUserData };
