@@ -3,10 +3,15 @@ import postMiddleware from "../middleware/postMiddleware";
 import mustHaveIdMiddleware from "../middleware/mustHaveIdMiddleware";
 import {
   fetchUserData,
+  login,
   postUserData,
   register,
   updateUserData,
 } from "../controller/api";
+import {
+  loginMiddleware,
+  registerMiddleware,
+} from "../middleware/authMiddleware";
 
 const router = express.Router();
 
@@ -21,6 +26,7 @@ router.put(
   updateUserData
 );
 router.post("/post-user-data", postMiddleware, postUserData);
-router.post("/register", register);
+router.post("/register", registerMiddleware, register);
+router.post("/login", loginMiddleware, login);
 
 export default router;

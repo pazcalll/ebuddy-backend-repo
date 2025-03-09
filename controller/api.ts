@@ -14,6 +14,7 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   UserInfo,
+  signInWithEmailAndPassword,
 } from "firebase/auth";
 import { TAuth } from "../entities/auth";
 import { TFirebaseUser, TTokenManager } from "../entities/firebaseUser";
@@ -99,4 +100,38 @@ const register = async (req: Request, res: Response) => {
   }
 };
 
-export { postUserData, fetchUserData, updateUserData, register };
+const login = async (req: Request, res: Response) => {
+  const auth = getAuth();
+  const body = req.body;
+
+  try {
+    const signInResponse = await signInWithEmailAndPassword(
+      auth,
+      body.email,
+      body.password
+    );
+    const user = signInResponse.user;
+    const providerData = user.providerData[0];
+    const detailJson: TFirebaseUser & {
+      providerData: UserInfo;
+      stsTokenManager: TTokenManager;
+    } = user.toJSON() as TFirebaseUser & {
+      providerData: UserInfo;
+      stsTokenManager: TTokenManager;
+    };
+
+    const authenticated: TAuth = {
+      uid: detailJson?.uid,
+      email: providerData.email as string,
+      refreshToken: user.refreshToken,
+      token: detailJson?.stsTokenManager?.accessToken,
+    };
+
+    res.status(200).json(authenticated);
+  } catch (error: any) {
+    console.error("Error logging in user: ", error);
+    res.status(400).json({ message: error?.message });
+  }
+};
+
+export { postUserData, fetchUserData, updateUserData, register, login };
