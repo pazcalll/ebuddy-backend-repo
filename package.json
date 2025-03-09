@@ -19,6 +19,7 @@
     "dev": "nodemon core/app.ts"
   },
   "dependencies": {
-    "firebase": "^11.4.0"
+    "firebase": "^11.4.0",
+    "zod": "^3.24.2"
   }
 }
