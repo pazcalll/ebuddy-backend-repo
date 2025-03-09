@@ -1,4 +1,5 @@
 import express, { Request, Response } from "express";
+import postUserData from "../repository/userCollection";
 
 const router = express.Router();
 
@@ -11,5 +12,6 @@ router.get("/fetch-user-data", (req: Request, res: Response) => {
 router.get("/update-user-data", (req: Request, res: Response) => {
   res.send("Updating user data");
 });
+router.post("/post-user-data", postUserData);
 
 export default router;
