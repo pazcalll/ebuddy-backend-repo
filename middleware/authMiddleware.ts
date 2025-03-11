@@ -35,11 +35,14 @@ const authenticatedMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.headers["access-token"];
-
-  if (!token) res.status(401).json({ message: "Unauthorized" });
-
   try {
+    const token = req.headers.authorization?.split(" ")[1];
+
+    if (!token) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
     const verificationResponse = await admin
       .auth()
       .verifyIdToken(token as string);
