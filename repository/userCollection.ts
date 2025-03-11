@@ -6,11 +6,12 @@ export default function userCollection(
 ): TUser[] {
   const users: TUser[] = [];
   querySnapshot.forEach((doc) => {
+    const docData = doc.data();
     const data: TUser = {
       _id: doc.id,
-      totalAverageWeightRatings: doc.data().totalAverageWeightRatings,
-      numberOfRents: doc.data().numberOfRents,
-      recentlyActive: doc.data().recentlyActive,
+      totalAverageWeightRatings: docData.totalAverageWeightRatings,
+      numberOfRents: docData.numberOfRents,
+      recentlyActive: docData.recentlyActive,
     };
     users.push(data);
   });

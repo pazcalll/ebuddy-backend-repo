@@ -8,33 +8,31 @@ import {
   doc,
   getDoc,
 } from "firebase/firestore";
-import { TUser } from "../entities/user";
+import { TUser, UserSchema } from "../entities/user";
 import userCollection from "../repository/userCollection";
 import {
   getAuth,
   createUserWithEmailAndPassword,
-  UserInfo,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { TAuth } from "../entities/auth";
-import { TFirebaseUser, TTokenManager } from "../entities/firebaseUser";
+import { TAuthenticatedUser } from "../entities/auth";
+import { TFirebaseUser } from "../entities/firebaseUser";
 
 const postUserData = async (req: Request, res: Response) => {
   try {
-    const user: Partial<TUser> = {
-      totalAverageWeightRatings: req.body.totalAverageWeightRatings,
-      numberOfRents: req.body.numberOfRents,
-      recentlyActive: req.body.recentlyActive,
+    const validated = UserSchema.omit({ _id: true }).parse(req.body);
+    const docRef = await addDoc(collection(db, "USERS"), validated);
+
+    const v: TUser = {
+      _id: docRef.id,
+      ...validated,
     };
-    const docRef = await addDoc(collection(db, "USERS"), user);
 
-    user._id = docRef.id;
-
-    res.json(user);
+    res.json(v);
   } catch (e) {
     console.error("Error adding document: ", e);
+    res.status(500).send({ message: "Error adding document" });
   }
-  //   res.send("Posting user data");
 };
 
 const fetchUserData = async (req: Request, res: Response) => {
@@ -79,20 +77,17 @@ const register = async (req: Request, res: Response) => {
       body.email,
       body.password
     );
+
     const providerData = userCredential.user.providerData[0];
-    const detailJson: TFirebaseUser & {
-      providerData: UserInfo;
-      stsTokenManager: TTokenManager;
-    } = userCredential.user.toJSON() as TFirebaseUser & {
-      providerData: UserInfo;
-      stsTokenManager: TTokenManager;
-    };
-    const authenticated: TAuth = {
+    const detailJson: TFirebaseUser =
+      userCredential.user.toJSON() as TFirebaseUser;
+    const authenticated: TAuthenticatedUser = {
       uid: detailJson?.uid,
       email: providerData.email as string,
       refreshToken: userCredential.user.refreshToken,
       token: detailJson?.stsTokenManager?.accessToken,
     };
+
     res.status(200).json(authenticated);
   } catch (error: any) {
     console.error("Error registering user: ", error);
@@ -112,15 +107,9 @@ const login = async (req: Request, res: Response) => {
     );
     const user = signInResponse.user;
     const providerData = user.providerData[0];
-    const detailJson: TFirebaseUser & {
-      providerData: UserInfo;
-      stsTokenManager: TTokenManager;
-    } = user.toJSON() as TFirebaseUser & {
-      providerData: UserInfo;
-      stsTokenManager: TTokenManager;
-    };
+    const detailJson: TFirebaseUser = user.toJSON() as TFirebaseUser;
 
-    const authenticated: TAuth = {
+    const authenticated: TAuthenticatedUser = {
       uid: detailJson?.uid,
       email: providerData.email as string,
       refreshToken: user.refreshToken,
