@@ -21,10 +21,14 @@ const registerMiddleware = async (
     .refine((data) => data.password === data.confirmPassword, {
       message: "Passwords do not match",
     });
+  console.log("req.body", req.body);
 
   const validation = user.safeParse(req.body);
   if (!validation.success) {
-    res.json(validation);
+    res.json({
+      message: "Validation error",
+      ...validation,
+    });
     return;
   }
   console.log("validation", validation);
@@ -48,7 +52,10 @@ const loginMiddleware = async (
 
   const validation = user.safeParse(req.body);
   if (!validation.success) {
-    res.json(validation);
+    res.json({
+      message: "Validation error",
+      ...validation,
+    });
     return;
   }
 
