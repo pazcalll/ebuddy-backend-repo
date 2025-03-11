@@ -101,10 +101,9 @@ const register = async (req: Request, res: Response) => {
 };
 
 const login = async (req: Request, res: Response) => {
-  const auth = getAuth();
-  const body = req.body;
-
   try {
+    const auth = getAuth();
+    const body = req.body;
     const signInResponse = await signInWithEmailAndPassword(
       auth,
       body.email,
