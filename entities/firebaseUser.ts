@@ -6,13 +6,13 @@ const TokenManagerSchema = z.object({
   expirationTime: z.number(),
 });
 
-const ProviderData = z.object({
-  displayName: z.string().nullable(),
-  email: z.string().nullable(),
-  phoneNumber: z.string().nullable(),
-  photoURL: z.string().nullable(),
-  providerId: z.string().nullable(),
-  uid: z.string().nullable(),
+const ProviderDataSchema = z.object({
+  displayName: z.string(),
+  email: z.string(),
+  phoneNumber: z.string(),
+  photoURL: z.string(),
+  providerId: z.string(),
+  uid: z.string(),
 });
 
 const FirebaseUserSchema = z.object({
@@ -30,11 +30,41 @@ const FirebaseUserSchema = z.object({
   apiKey: z.string(),
   appName: z.string(),
   stsTokenManager: TokenManagerSchema,
-  providerData: z.array(ProviderData).nullish(),
+  providerData: z.array(ProviderDataSchema.nullish()).nullish(),
+});
+
+const FirebaseUserProfileSchema = z.object({
+  uid: z.string(),
+  email: z.string(),
+  emailVerified: z.boolean(),
+  disabled: z.boolean(),
+  metadata: z.object({
+    lastSignInTime: z.string(),
+    creationTime: z.string(),
+    lastRefreshTime: z.string(),
+  }),
+  tokensValidAfterTime: z.string(),
+  providerData: z
+    .array(
+      ProviderDataSchema.partial({
+        phoneNumber: true,
+        photoURL: true,
+        displayName: true,
+      })
+    )
+    .nullish(),
 });
 
 type TFirebaseUser = z.infer<typeof FirebaseUserSchema>;
 type TTokenManager = z.infer<typeof TokenManagerSchema>;
-type TProviderData = z.infer<typeof ProviderData>;
+type TProviderData = z.infer<typeof ProviderDataSchema>;
+type TFirebaseUserProfile = z.infer<typeof FirebaseUserProfileSchema>;
 
-export { FirebaseUserSchema, TFirebaseUser, TTokenManager, TProviderData };
+export {
+  FirebaseUserSchema,
+  FirebaseUserProfileSchema,
+  TFirebaseUser,
+  TTokenManager,
+  TProviderData,
+  TFirebaseUserProfile,
+};

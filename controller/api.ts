@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { db } from "../config/firebaseConfig";
+import { admin, db } from "../config/firebaseConfig";
 import {
   collection,
   addDoc,
@@ -16,7 +16,7 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { TAuthenticatedUser } from "../entities/auth";
-import { TFirebaseUser } from "../entities/firebaseUser";
+import { TFirebaseUser, TFirebaseUserProfile } from "../entities/firebaseUser";
 
 const postUserData = async (req: Request, res: Response) => {
   try {
@@ -65,6 +65,23 @@ const updateUserData = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error updating document: ", error);
     res.send("Error updating document");
+  }
+};
+
+const profile = async (req: Request, res: Response) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    const verificationResponse = await admin
+      .auth()
+      .verifyIdToken(token as string);
+    const uid = verificationResponse.uid;
+    const user: TFirebaseUserProfile = (await admin
+      .auth()
+      .getUser(uid)) as TFirebaseUserProfile;
+    res.status(200).json(user);
+  } catch (error: any) {
+    console.log(error);
+    res.status(401).json({ message: error?.message });
   }
 };
 
@@ -122,4 +139,11 @@ const login = async (req: Request, res: Response) => {
   }
 };
 
-export { postUserData, fetchUserData, updateUserData, register, login };
+export {
+  postUserData,
+  fetchUserData,
+  updateUserData,
+  register,
+  login,
+  profile,
+};

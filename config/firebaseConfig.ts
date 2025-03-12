@@ -5,6 +5,7 @@ import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 import admin, { auth } from "firebase-admin";
 import dotenv from "dotenv";
 import { connectAuthEmulator, getAuth } from "firebase/auth";
+import serviceAccount from "./../service-account-file.json";
 
 dotenv.config();
 // TODO: Add SDKs for Firebase products that you want to use
@@ -27,7 +28,7 @@ console.log(firebaseConfig);
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 admin.initializeApp({
-  credential: admin.credential.applicationDefault(),
+  credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
   projectId: firebaseConfig.projectId,
   databaseURL: firebaseConfig.databaseURL,
 });

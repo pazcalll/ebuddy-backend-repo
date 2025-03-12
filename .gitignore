@@ -4,3 +4,4 @@
 firebase-debug.log
 firestore-debug.log
 database-debug.log
+service-account-file.json
